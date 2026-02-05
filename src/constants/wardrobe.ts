@@ -92,7 +92,7 @@ export const CANVAS_LIGHTING = {
 };
 
 export const APP_CONFIG = {
-  appName: 'SnapSpace',
+  appName: 'Wodexo',
   appSubtitle: 'Wardrobe Configurator',
   currency: '₹',
 };
