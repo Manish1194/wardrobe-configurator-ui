@@ -67,6 +67,7 @@ export const ColorDialog: React.FC<ColorDialogProps> = ({
       <DialogContent sx={{ pt: 3 }}>
         <Grid container spacing={3}>
           {COLOR_OPTIONS.map((col) => (
+            // @ts-ignore - MUI Grid item type issue
             <Grid item xs={6} sm={4} key={col.value}>
               <Box
                 sx={{

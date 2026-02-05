@@ -19,7 +19,7 @@ export const PriceCard: React.FC = () => {
   const sqFt = calculateSquareFootage(state.dimensions);
   const pricePerSqFt = getTotalPricePerSqFt(state.material, state.color);
   const materialPrice = getMaterialPrice(state.material);
-  const colorPrice = getColorPrice(state.material);
+  const colorPrice = getColorPrice(state.color);
 
   const materialName = MATERIAL_OPTIONS.find(m => m.value === state.material)?.name;
   const colorName = COLOR_OPTIONS.find(c => c.value === state.color)?.name;

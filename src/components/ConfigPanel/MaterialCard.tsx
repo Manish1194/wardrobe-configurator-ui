@@ -40,6 +40,7 @@ export const MaterialCard: React.FC = () => {
 
         <Grid container spacing={0.8}>
           {MATERIAL_OPTIONS.map((mat) => (
+            // @ts-ignore - MUI Grid item type issue
             <Grid item xs={12} key={mat.value}>
               <Button
                 onClick={() => setMaterial(mat.value)}

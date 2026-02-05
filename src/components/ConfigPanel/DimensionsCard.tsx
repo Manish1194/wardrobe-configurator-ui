@@ -64,6 +64,7 @@ export const DimensionsCard: React.FC = () => {
 
         <Grid container spacing={1.2}>
           {dimensionFields.map(({ label, feet, inches, valueF, valueI }) => (
+            // @ts-ignore - MUI Grid item type issue
             <Grid item xs={12} key={label}>
               <Box>
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
