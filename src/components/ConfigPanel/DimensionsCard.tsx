@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { TextField, Card, CardContent, Typography, Box, Grid, alpha } from '@mui/material';
+import { TextField, Card, CardContent, Typography, Box, Stack, alpha } from '@mui/material';
 import { DIMENSION_CONSTRAINTS, THEME_COLORS } from '../../constants/wardrobe';
 import { useWardrobe } from '../../hooks/useWardrobe';
 
@@ -62,10 +62,9 @@ export const DimensionsCard: React.FC = () => {
           📏 Dimensions
         </Typography>
 
-        <Grid container spacing={1.2}>
+        <Stack spacing={1.2}>
           {dimensionFields.map(({ label, feet, inches, valueF, valueI }) => (
-            // @ts-ignore - MUI Grid item type issue
-            <Grid item xs={12} key={label}>
+            <Box key={label}>
               <Box>
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
                   {label}
@@ -119,9 +118,9 @@ export const DimensionsCard: React.FC = () => {
                   />
                 </Box>
               </Box>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Stack>
       </CardContent>
     </Card>
   );

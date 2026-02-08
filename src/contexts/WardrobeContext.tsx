@@ -3,22 +3,45 @@
  * Centralized state management for the wardrobe configurator
  */
 
-import React, { createContext, useState, useCallback } from 'react';
+import React, { createContext, useState, useCallback, useEffect } from 'react';
 import {
   WardrobeContextType,
   WardrobeState,
   WardrobeDimensions,
-  MaterialType,
-  ColorType,
+  ProductType,
+  ViewSide,
+  InnerStructure,
+  OuterStructure,
+  MaterialConfig,
 } from '../types/wardrobe';
 import { calculatePrice } from '../utils/pricingEngine';
-import { DEFAULT_DIMENSIONS, MATERIAL_OPTIONS, COLOR_OPTIONS } from '../constants/wardrobe';
+import { DEFAULT_DIMENSIONS } from '../constants/wardrobe';
 
 export const WardrobeContext = createContext<WardrobeContextType | undefined>(undefined);
 
 interface WardrobeProviderProps {
   children: React.ReactNode;
 }
+
+const INITIAL_MATERIAL_CONFIG: MaterialConfig = {
+  baseMaterial: 'particle_board',
+  baseColor: 'white',
+  aesthetic: 'laminate',
+  aestheticColor: 'white',
+  hardwareBrand: 'hafele',
+};
+
+const INITIAL_INNER_STRUCTURE: InnerStructure = {
+  shelves: 4,
+  hangings: 2,
+  drawers: 2,
+};
+
+const INITIAL_OUTER_STRUCTURE: OuterStructure = {
+  doors: 2,
+  openingType: 'slide',
+  design: 'Modern',
+};
 
 /**
  * WardrobeProvider component to wrap the application
@@ -27,81 +50,82 @@ interface WardrobeProviderProps {
 export const WardrobeProvider: React.FC<WardrobeProviderProps> = ({ children }) => {
   // Initialize state
   const [state, setState] = useState<WardrobeState>({
+    step: 1,
+    productType: 'wardrobe',
     dimensions: DEFAULT_DIMENSIONS,
-    material: MATERIAL_OPTIONS[0].value as MaterialType,
-    color: COLOR_OPTIONS[0].value as ColorType,
-    price: calculatePrice(DEFAULT_DIMENSIONS, MATERIAL_OPTIONS[0].value as MaterialType, COLOR_OPTIONS[0].value as ColorType),
+    viewSide: 'outer',
+    innerStructure: INITIAL_INNER_STRUCTURE,
+    outerStructure: INITIAL_OUTER_STRUCTURE,
+    materialConfig: INITIAL_MATERIAL_CONFIG,
+    price: 0, // Will be calculated immediately
   });
 
   // Track current view (config or quote)
   const [view, setView] = useState<'config' | 'quote'>('config');
 
-  /**
-   * Update dimensions and recalculate price
-   */
+  // Recalculate price whenever relevant state changes
+  useEffect(() => {
+    setState((prevState) => ({
+      ...prevState,
+      price: calculatePrice(prevState.dimensions, prevState.materialConfig),
+    }));
+  }, [state.dimensions, state.materialConfig]);
+
+  const setStep = useCallback((step: number) => {
+    setState((prev) => ({ ...prev, step }));
+  }, []);
+
+  const setProductType = useCallback((productType: ProductType) => {
+    setState((prev) => ({ ...prev, productType }));
+  }, []);
+
   const setDimensions = useCallback((dimensions: WardrobeDimensions) => {
-    setState((prevState) => ({
-      ...prevState,
-      dimensions,
-      price: calculatePrice(dimensions, prevState.material, prevState.color),
+    setState((prev) => ({ ...prev, dimensions }));
+  }, []);
+
+  const setViewSide = useCallback((viewSide: ViewSide) => {
+    setState((prev) => ({ ...prev, viewSide }));
+  }, []);
+
+  const setInnerStructure = useCallback((structure: Partial<InnerStructure>) => {
+    setState((prev) => ({
+      ...prev,
+      innerStructure: { ...prev.innerStructure, ...structure },
     }));
   }, []);
 
-  /**
-   * Update material and recalculate price
-   */
-  const setMaterial = useCallback((material: MaterialType) => {
-    setState((prevState) => ({
-      ...prevState,
-      material,
-      price: calculatePrice(prevState.dimensions, material, prevState.color),
+  const setOuterStructure = useCallback((structure: Partial<OuterStructure>) => {
+    setState((prev) => ({
+      ...prev,
+      outerStructure: { ...prev.outerStructure, ...structure },
     }));
   }, []);
 
-  /**
-   * Update color and recalculate price
-   */
-  const setColor = useCallback((color: ColorType) => {
-    setState((prevState) => ({
-      ...prevState,
-      color,
-      price: calculatePrice(prevState.dimensions, prevState.material, color),
+  const setMaterialConfig = useCallback((config: Partial<MaterialConfig>) => {
+    setState((prev) => ({
+      ...prev,
+      materialConfig: { ...prev.materialConfig, ...config },
     }));
   }, []);
 
-  /**
-   * Handle dimension input changes
-   * Validates and updates specific dimension property
-   */
   const handleDimensionChange = useCallback((key: keyof WardrobeDimensions, value: string) => {
     const numValue = parseInt(value, 10);
     if (isNaN(numValue) || numValue < 0) return;
 
-    setState((prevState) => {
+    setState((prev) => {
       const newDimensions = {
-        ...prevState.dimensions,
+        ...prev.dimensions,
         [key]: numValue,
       };
-
-      return {
-        ...prevState,
-        dimensions: newDimensions,
-        price: calculatePrice(newDimensions, prevState.material, prevState.color),
-      };
+      return { ...prev, dimensions: newDimensions };
     });
   }, []);
 
-  /**
-   * Generate quote - navigate to quote view
-   */
   const generateQuote = useCallback(() => {
     console.log('Quote Generated:', state);
     setView('quote');
   }, [state]);
 
-  /**
-   * Go back to config view
-   */
   const backToConfig = useCallback(() => {
     setView('config');
   }, []);
@@ -109,9 +133,13 @@ export const WardrobeProvider: React.FC<WardrobeProviderProps> = ({ children }) 
   const value: WardrobeContextType = {
     state,
     view,
+    setStep,
+    setProductType,
     setDimensions,
-    setMaterial,
-    setColor,
+    setViewSide,
+    setInnerStructure,
+    setOuterStructure,
+    setMaterialConfig,
     handleDimensionChange,
     generateQuote,
     backToConfig,

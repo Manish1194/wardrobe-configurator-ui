@@ -45,8 +45,7 @@ export const CanvasView: React.FC = () => {
       {/* 3D Model */}
       <Wardrobe3D
         dimensions={state.dimensions}
-        material={state.material}
-        color={state.color}
+        config={state.materialConfig}
       />
 
       {/* Camera Controls */}

@@ -3,56 +3,54 @@
  * Central location for all static data: materials, colors, pricing
  */
 
-import { Material, Color } from '../types/wardrobe';
+import { BaseMaterialOption, AestheticOption, HardwareOption, ProductOption } from '../types/wardrobe';
 
-export const MATERIAL_OPTIONS: Material[] = [
+export const PRODUCT_OPTIONS: ProductOption[] = [
+  { value: 'wardrobe', label: 'Wardrobe' },
+  { value: 'bar_unit', label: 'Bar Unit' },
+  { value: 'sneakers_storage', label: 'Sneakers Storage' },
+  { value: 'modular_kitchen', label: 'Modular Kitchen', disabled: true },
+];
+
+export const BASE_MATERIAL_OPTIONS: (BaseMaterialOption & { roughness: number; metalness: number })[] = [
+  { value: 'particle_board', label: 'Particle Board', pricePerSqFt: 600, roughness: 0.9, metalness: 0 },
+  { value: 'ply', label: 'Ply', pricePerSqFt: 700, roughness: 0.7, metalness: 0 },
+  { value: 'hdhmr', label: 'HDHMR', pricePerSqFt: 800, roughness: 0.5, metalness: 0.1 },
+];
+
+export const AESTHETIC_OPTIONS: (AestheticOption & { roughness: number; metalness: number })[] = [
+  { value: 'laminate', label: 'Laminate', pricePerSqFt: 300, roughness: 0.4, metalness: 0 },
+  { value: 'membrane', label: 'Membrane', pricePerSqFt: 250, roughness: 0.6, metalness: 0 },
+  { value: 'pu', label: 'PU', pricePerSqFt: 600, roughness: 0.1, metalness: 0.1 },
+];
+
+export const HARDWARE_OPTIONS: HardwareOption[] = [
   {
-    value: 'mdf',
-    name: 'MDF',
-    pricePerSqFt: 120, // ₹120 per square foot
-    roughness: 0.3,
-    metalness: 0.1,
+    value: 'hafele',
+    label: 'Hafele',
+    prices: [
+      { heightFt: 6, price: 10000 },
+      { heightFt: 7, price: 12000 },
+      { heightFt: 8, price: 15000 },
+    ],
   },
   {
-    value: 'board',
-    name: 'Board',
-    pricePerSqFt: 95, // ₹95 per square foot
-    roughness: 0.8,
-    metalness: 0.0,
+    value: 'blum',
+    label: 'BLUM',
+    prices: [
+      { heightFt: 6, price: 15000 },
+      { heightFt: 7, price: 18000 },
+      { heightFt: 8, price: 21000 },
+    ],
   },
 ];
 
-export const COLOR_OPTIONS: Color[] = [
-  {
-    value: 'oak-wood',
-    name: 'Oak Wood',
-    hex: '#8B4513',
-    pricePerSqFt: 0, // No surcharge
-  },
-  {
-    value: 'matte-grey',
-    name: 'Matte Grey',
-    hex: '#A9A9A9',
-    pricePerSqFt: -10, // ₹10 discount
-  },
-  {
-    value: 'acrylic-black',
-    name: 'Acrylic Black',
-    hex: '#000000',
-    pricePerSqFt: 25, // ₹25 surcharge
-  },
-  {
-    value: 'walnut-brown',
-    name: 'Walnut Brown',
-    hex: '#654321',
-    pricePerSqFt: 15, // ₹15 surcharge
-  },
-  {
-    value: 'ivory-white',
-    name: 'Ivory White',
-    hex: '#FFFFF0',
-    pricePerSqFt: -5, // ₹5 discount
-  },
+export const COLOR_VARIANTS = [
+  { value: 'white', label: 'White', hex: '#FFFFFF' },
+  { value: 'grey', label: 'Grey', hex: '#808080' },
+  { value: 'black', label: 'Black', hex: '#000000' },
+  { value: 'oak', label: 'Oak', hex: '#D2B48C' },
+  { value: 'walnut', label: 'Walnut', hex: '#5D4037' },
 ];
 
 export const THEME_COLORS = {

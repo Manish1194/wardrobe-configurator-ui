@@ -5,14 +5,13 @@
 
 import React, { useMemo } from 'react';
 import { Mesh } from 'three';
-import { MATERIAL_OPTIONS, COLOR_OPTIONS } from '../../constants/wardrobe';
-import { WardrobeDimensions, MaterialType, ColorType } from '../../types/wardrobe';
+import { AESTHETIC_OPTIONS, COLOR_VARIANTS } from '../../constants/wardrobe';
+import { WardrobeDimensions, MaterialConfig } from '../../types/wardrobe';
 import { convertToDecimalFeet } from '../../utils/pricingEngine';
 
 interface Wardrobe3DProps {
   dimensions: WardrobeDimensions;
-  material: MaterialType;
-  color: ColorType;
+  config: MaterialConfig;
 }
 
 /**
@@ -21,16 +20,17 @@ interface Wardrobe3DProps {
  * Updates in real-time when dimensions, material, or color changes
  */
 export const Wardrobe3D = React.forwardRef<Mesh, Wardrobe3DProps>(
-  ({ dimensions, material, color }, ref) => {
-    // Memoize material and color lookup to avoid unnecessary recalculations
-    const materialData = useMemo(
-      () => MATERIAL_OPTIONS.find((m) => m.value === material),
-      [material]
+  ({ dimensions, config }, ref) => {
+    // Memoize material and color lookup
+    // Use Aesthetic for the visible surface finish
+    const aestheticData = useMemo(
+      () => AESTHETIC_OPTIONS.find((m) => m.value === config.aesthetic),
+      [config.aesthetic]
     );
 
     const colorData = useMemo(
-      () => COLOR_OPTIONS.find((c) => c.value === color),
-      [color]
+      () => COLOR_VARIANTS.find((c) => c.value === config.aestheticColor),
+      [config.aestheticColor]
     );
 
     // Convert feet and inches to decimal feet
@@ -49,19 +49,19 @@ export const Wardrobe3D = React.forwardRef<Mesh, Wardrobe3DProps>(
       [dimensions.depthFeet, dimensions.depthInches]
     );
 
-    // Early return if data not found
-    if (!materialData || !colorData) {
-      return null;
-    }
+    // Default fallbacks if data not found (shouldn't happen with correct defaults)
+    const colorHex = colorData?.hex || '#ffffff';
+    const roughness = aestheticData?.roughness ?? 0.5;
+    const metalness = aestheticData?.metalness ?? 0;
 
     return (
-      <mesh ref={ref} position={[0, 0, 0]} castShadow receiveShadow>
+      <mesh ref={ref} position={[0, height / 2, 0]} castShadow receiveShadow>
+        {/* Box geometry centered at origin, so we move it up by height/2 */}
         <boxGeometry args={[width, height, depth]} />
         <meshStandardMaterial
-          color={colorData.hex}
-          roughness={materialData.roughness}
-          metalness={materialData.metalness}
-          side={2} // THREE.DoubleSide for visibility from all angles
+          color={colorHex}
+          roughness={roughness}
+          metalness={metalness}
         />
       </mesh>
     );

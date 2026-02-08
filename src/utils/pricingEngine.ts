@@ -3,8 +3,8 @@
  * Calculates wardrobe pricing based on dimensions, material, and color
  */
 
-import { WardrobeDimensions, MaterialType, ColorType } from '../types/wardrobe';
-import { MATERIAL_OPTIONS, COLOR_OPTIONS } from '../constants/wardrobe';
+import { WardrobeDimensions, MaterialConfig } from '../types/wardrobe';
+import { BASE_MATERIAL_OPTIONS, AESTHETIC_OPTIONS, HARDWARE_OPTIONS } from '../constants/wardrobe';
 
 /**
  * Convert feet and inches to decimal feet
@@ -24,106 +24,74 @@ export const convertFromDecimalFeet = (decimalFeet: number): { feet: number; inc
 
 /**
  * Calculate square footage (footprint area)
- * Area = width × depth (in square feet)
+ * Area = width × height (user said "Total area = Height * width")
+ * Note: Usually wardrobe pricing is based on Frontal Area (Height * Width) for sliding doors/shutters calculation.
  */
 export const calculateSquareFootage = (dimensions: WardrobeDimensions): number => {
   const widthFt = convertToDecimalFeet(dimensions.widthFeet, dimensions.widthInches);
-  const depthFt = convertToDecimalFeet(dimensions.depthFeet, dimensions.depthInches);
-  return widthFt * depthFt;
+  const heightFt = convertToDecimalFeet(dimensions.heightFeet, dimensions.heightInches);
+  return widthFt * heightFt;
 };
 
 /**
- * Calculate total price based on dimensions, material, and color
- * Formula: squareFootage × (material.pricePerSqFt + color.pricePerSqFt)
- * 
- * @param dimensions - Width, Height, Depth in feet and inches
- * @param material - Selected material type
- * @param color - Selected color type
- * @returns Total price in rupees (rounded)
+ * Calculate Hardware Price based on Height
+ */
+export const calculateHardwarePrice = (hardwareBrand: string, heightFeet: number): number => {
+  const hardwareOption = HARDWARE_OPTIONS.find(h => h.value === hardwareBrand);
+  if (!hardwareOption) return 0;
+
+  // Simple logic: Find the price tier that matches or exceeds the height
+  // If height is less than smallest tier, use smallest tier.
+  // If height is greater than largest tier, use largest tier (or maybe extrapolate, but for now max tier).
+  
+  const sortedPrices = [...hardwareOption.prices].sort((a, b) => a.heightFt - b.heightFt);
+  
+  // Find first tier where tier.heightFt >= heightFeet
+  const tier = sortedPrices.find(p => p.heightFt >= heightFeet);
+  
+  if (tier) return tier.price;
+  
+  // If height is larger than all tiers, return the max tier price
+  return sortedPrices[sortedPrices.length - 1].price;
+};
+
+/**
+ * Calculate total price based on dimensions and material config
+ * Formula: (Area * Base_Price) + (Area * Aesthetic_Price) + Hardware_Price
  */
 export const calculatePrice = (
   dimensions: WardrobeDimensions,
-  material: MaterialType,
-  color: ColorType
+  config: MaterialConfig
 ): number => {
-  // Calculate square footage
-  const squareFootage = calculateSquareFootage(dimensions);
+  // Calculate square footage (Height * Width)
+  const area = calculateSquareFootage(dimensions);
+  const heightFt = convertToDecimalFeet(dimensions.heightFeet, dimensions.heightInches);
 
-  // Find material price
-  const materialData = MATERIAL_OPTIONS.find((m) => m.value === material);
-  if (!materialData) {
-    console.warn(`Material ${material} not found`);
-    return 0;
-  }
+  // Get Base Material Price
+  const baseMaterial = BASE_MATERIAL_OPTIONS.find(m => m.value === config.baseMaterial);
+  const basePrice = baseMaterial ? baseMaterial.pricePerSqFt : 0;
 
-  // Find color price surcharge
-  const colorData = COLOR_OPTIONS.find((c) => c.value === color);
-  if (!colorData) {
-    console.warn(`Color ${color} not found`);
-    return 0;
-  }
+  // Get Aesthetic Price
+  const aesthetic = AESTHETIC_OPTIONS.find(a => a.value === config.aesthetic);
+  const aestheticPrice = aesthetic ? aesthetic.pricePerSqFt : 0;
 
-  // Calculate final price
-  const pricePerSqFt = materialData.pricePerSqFt + colorData.pricePerSqFt;
-  const price = squareFootage * pricePerSqFt;
+  // Get Hardware Price
+  const hardwarePrice = calculateHardwarePrice(config.hardwareBrand, heightFt);
+
+  // Total Calculation
+  const totalBaseCost = area * basePrice;
+  const totalAestheticCost = area * aestheticPrice;
+  
+  const totalPrice = totalBaseCost + totalAestheticCost + hardwarePrice;
 
   // Round to nearest integer
-  return Math.round(price);
+  return Math.round(totalPrice);
 };
 
 /**
  * Format price with currency symbol and thousands separator
- * 
- * @param price - Price in rupees
- * @param currency - Currency symbol (default: ₹)
- * @returns Formatted price string
  */
 export const formatPrice = (price: number, currency: string = '₹'): string => {
   return `${currency}${price.toLocaleString('en-IN')}`;
 };
 
-/**
- * Get material price per square foot
- */
-export const getMaterialPrice = (material: MaterialType): number => {
-  const materialData = MATERIAL_OPTIONS.find((m) => m.value === material);
-  return materialData?.pricePerSqFt || 0;
-};
-
-/**
- * Get color price surcharge per square foot
- */
-export const getColorPrice = (color: ColorType): number => {
-  const colorData = COLOR_OPTIONS.find((c) => c.value === color);
-  return colorData?.pricePerSqFt || 0;
-};
-
-/**
- * Get total price per square foot (material + color)
- */
-export const getTotalPricePerSqFt = (material: MaterialType, color: ColorType): number => {
-  return getMaterialPrice(material) + getColorPrice(color);
-};
-
-/**
- * Generate price breakdown for quote
- */
-export const getPriceBreakdown = (
-  dimensions: WardrobeDimensions,
-  material: MaterialType,
-  color: ColorType
-) => {
-  const squareFootage = calculateSquareFootage(dimensions);
-  const materialPrice = getMaterialPrice(material);
-  const colorPrice = getColorPrice(color);
-  const totalPricePerSqFt = getTotalPricePerSqFt(material, color);
-  const finalPrice = calculatePrice(dimensions, material, color);
-
-  return {
-    squareFootage: parseFloat(squareFootage.toFixed(2)),
-    materialPricePerSqFt: materialPrice,
-    colorPricePerSqFt: colorPrice,
-    totalPricePerSqFt,
-    finalPrice,
-  };
-};

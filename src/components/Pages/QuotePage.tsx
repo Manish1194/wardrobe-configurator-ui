@@ -12,13 +12,11 @@ import {
   Button,
   Divider,
   Stack,
-  Grid,
-  Chip,
   alpha,
 } from '@mui/material';
 import { useWardrobe } from '../../hooks/useWardrobe';
-import { MATERIAL_OPTIONS, COLOR_OPTIONS, THEME_COLORS } from '../../constants/wardrobe';
-import { calculateSquareFootage, getTotalPricePerSqFt } from '../../utils/pricingEngine';
+import { BASE_MATERIAL_OPTIONS, AESTHETIC_OPTIONS, HARDWARE_OPTIONS, THEME_COLORS } from '../../constants/wardrobe';
+import { calculateSquareFootage, calculateHardwarePrice, formatPrice } from '../../utils/pricingEngine';
 
 /**
  * QuotePage Component
@@ -27,17 +25,30 @@ import { calculateSquareFootage, getTotalPricePerSqFt } from '../../utils/pricin
 export const QuotePage: React.FC = () => {
   const { state, backToConfig } = useWardrobe();
 
-  const material = MATERIAL_OPTIONS.find((m) => m.value === state.material);
-  const color = COLOR_OPTIONS.find((c) => c.value === state.color);
+  const baseMaterial = BASE_MATERIAL_OPTIONS.find((m) => m.value === state.materialConfig.baseMaterial);
+  const aesthetic = AESTHETIC_OPTIONS.find((a) => a.value === state.materialConfig.aesthetic);
+  const hardware = HARDWARE_OPTIONS.find((h) => h.value === state.materialConfig.hardwareBrand);
+
   const area = calculateSquareFootage(state.dimensions);
-  const ratePerSqFt = getTotalPricePerSqFt(state.material, state.color);
+  const hardwarePrice = calculateHardwarePrice(
+    state.materialConfig.hardwareBrand, 
+    state.dimensions.heightFeet + state.dimensions.heightInches/12
+  );
 
   const widthDisplay = `${state.dimensions.widthFeet}'${state.dimensions.widthInches}"`;
   const heightDisplay = `${state.dimensions.heightFeet}'${state.dimensions.heightInches}"`;
   const depthDisplay = `${state.dimensions.depthFeet}'${state.dimensions.depthInches}"`;
 
   const PRIMARY_COLOR = THEME_COLORS.primary;
-  const SECONDARY_COLOR = THEME_COLORS.secondary;
+
+  const cardStyle = {
+    mb: 1,
+    backgroundColor: alpha(THEME_COLORS.primary, 0.05),
+    border: `1px solid ${alpha(THEME_COLORS.primary, 0.2)}`,
+    borderRadius: 2,
+    boxShadow: 'none',
+    transition: 'all 0.3s ease',
+  };
 
   return (
     <Box
@@ -48,303 +59,124 @@ export const QuotePage: React.FC = () => {
         gap: 2,
         p: 3,
         overflow: 'auto',
-        backgroundColor: 'rgba(255, 255, 255, 0.02)',
-        backgroundImage: 'linear-gradient(135deg, rgba(46, 125, 50, 0.05) 0%, rgba(211, 47, 47, 0.03) 100%)',
+        background: `linear-gradient(180deg, #FFFFFF 0%, #F8F9FA 100%)`,
       }}
     >
       {/* Header with Back Button */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 2,
-          pb: 2,
-          borderBottom: `2px solid ${PRIMARY_COLOR}`,
-        }}
-      >
+      <Box sx={{ display: 'flex', alignItems: 'center', pb: 2, borderBottom: `2px solid ${alpha(PRIMARY_COLOR, 0.1)}` }}>
         <Button
           onClick={backToConfig}
-          sx={{
-            color: PRIMARY_COLOR,
-            textTransform: 'none',
+          startIcon={<span>←</span>}
+          sx={{ 
+            color: PRIMARY_COLOR, 
+            textTransform: 'none', 
             fontSize: '1rem',
-            '&:hover': {
-              backgroundColor: alpha(PRIMARY_COLOR, 0.1),
-            },
+            fontWeight: 600
           }}
         >
-          ← Back to Configuration
+          Back to Configuration
         </Button>
         <Box sx={{ flex: 1 }} />
-        <Typography
-          sx={{
-            fontSize: '1.5rem',
-            fontWeight: 700,
-            color: PRIMARY_COLOR,
-          }}
-        >
-          ✓
+        <Typography variant="h6" color="primary" sx={{ fontWeight: 700 }}>
+          Quote Summary
         </Typography>
       </Box>
 
-      {/* Quote Title */}
-      <Typography
-        variant="h5"
-        sx={{
-          fontWeight: 700,
-          color: PRIMARY_COLOR,
-        }}
-      >
-        Quote Summary
-      </Typography>
+      <Stack spacing={2}>
+        {/* Dimensions & Type */}
+        <Box>
+          <Card sx={cardStyle}>
+            <CardContent>
+              <Typography variant="subtitle2" sx={{ color: PRIMARY_COLOR, fontWeight: 600, mb: 1 }}>
+                Product & Dimensions
+              </Typography>
+              <Typography variant="h6" sx={{ textTransform: 'capitalize', fontWeight: 700 }}>
+                {state.productType.replace('_', ' ')}
+              </Typography>
+              <Typography variant="body1" sx={{ mt: 0.5 }}>
+                {widthDisplay} (W) x {heightDisplay} (H) x {depthDisplay} (D)
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                Total Area: {area.toFixed(2)} sq ft
+              </Typography>
+            </CardContent>
+          </Card>
+        </Box>
 
-      {/* Configuration Summary Card */}
-      <Card
-        sx={{
-          backgroundColor: alpha(PRIMARY_COLOR, 0.05),
-          border: `1px solid ${alpha(PRIMARY_COLOR, 0.2)}`,
-          borderRadius: 2,
-          boxShadow: 'none',
-        }}
-      >
-        <CardContent sx={{ p: 2.5 }}>
-          <Typography
-            variant="subtitle1"
-            sx={{
-              fontWeight: 600,
-              color: PRIMARY_COLOR,
-              mb: 2,
-            }}
-          >
-            Configuration Details
-          </Typography>
-
-          <Grid container spacing={2}>
-            {/* Dimensions */}
-            {/* @ts-ignore - MUI Grid item type issue */}
-            <Grid item xs={12} sm={6}>
-              <Box sx={{ mb: 1.5 }}>
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                  Width
-                </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                  {widthDisplay}
-                </Typography>
-              </Box>
-            </Grid>
-            {/* @ts-ignore - MUI Grid item type issue */}
-            <Grid item xs={12} sm={6}>
-              <Box sx={{ mb: 1.5 }}>
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                  Height
-                </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                  {heightDisplay}
-                </Typography>
-              </Box>
-            </Grid>
-            {/* @ts-ignore - MUI Grid item type issue */}
-            <Grid item xs={12} sm={6}>
-              <Box sx={{ mb: 1.5 }}>
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                  Depth
-                </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                  {depthDisplay}
-                </Typography>
-              </Box>
-            </Grid>
-            {/* @ts-ignore - MUI Grid item type issue */}
-            <Grid item xs={12} sm={6}>
-              <Box sx={{ mb: 1.5 }}>
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                  Area
-                </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                  {area.toFixed(2)} sq ft
-                </Typography>
-              </Box>
-            </Grid>
-
-            {/* Material */}
-            {/* @ts-ignore - MUI Grid item type issue */}
-            <Grid item xs={12} sm={6}>
-              <Box sx={{ mb: 1.5 }}>
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                  Material
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                  <Chip
-                    label={material?.name || state.material}
-                    variant="outlined"
-                    size="small"
-                    sx={{
-                      backgroundColor: alpha(PRIMARY_COLOR, 0.1),
-                      borderColor: PRIMARY_COLOR,
-                      color: PRIMARY_COLOR,
-                      fontWeight: 600,
-                    }}
-                  />
+        {/* Structure */}
+        <Box>
+          <Card sx={cardStyle}>
+            <CardContent>
+              <Typography variant="subtitle2" sx={{ color: PRIMARY_COLOR, fontWeight: 600, mb: 1 }}>
+                Structure Configuration
+              </Typography>
+              <Stack direction="row" spacing={2}>
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="caption" display="block" sx={{ fontWeight: 600, mb: 0.5 }}>Inner Structure</Typography>
+                  <Typography variant="body2">Shelves: {state.innerStructure.shelves}</Typography>
+                  <Typography variant="body2">Hangings: {state.innerStructure.hangings}</Typography>
+                  <Typography variant="body2">Drawers: {state.innerStructure.drawers}</Typography>
                 </Box>
-              </Box>
-            </Grid>
-
-            {/* Color */}
-            {/* @ts-ignore - MUI Grid item type issue */}
-            <Grid item xs={12} sm={6}>
-              <Box sx={{ mb: 1.5 }}>
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                  Color
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                  {color?.hex && (
-                    <Box
-                      sx={{
-                        width: 20,
-                        height: 20,
-                        borderRadius: 1,
-                        backgroundColor: color.hex,
-                        border: `1px solid ${alpha('#000', 0.2)}`,
-                      }}
-                    />
-                  )}
-                  <Chip
-                    label={color?.name || state.color}
-                    variant="outlined"
-                    size="small"
-                    sx={{
-                      backgroundColor: alpha(color?.hex || PRIMARY_COLOR, 0.1),
-                      borderColor: color?.hex || PRIMARY_COLOR,
-                      color: PRIMARY_COLOR,
-                      fontWeight: 600,
-                    }}
-                  />
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="caption" display="block" sx={{ fontWeight: 600, mb: 0.5 }}>Outer Structure</Typography>
+                  <Typography variant="body2">Doors: {state.outerStructure.doors}</Typography>
+                  <Typography variant="body2">Opening: {state.outerStructure.openingType}</Typography>
+                  <Typography variant="body2">Design: {state.outerStructure.design}</Typography>
                 </Box>
-              </Box>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
+              </Stack>
+            </CardContent>
+          </Card>
+        </Box>
 
-      {/* Price Breakdown Card */}
-      <Card
-        sx={{
-          backgroundColor: alpha(SECONDARY_COLOR, 0.05),
-          border: `1px solid ${alpha(SECONDARY_COLOR, 0.2)}`,
-          borderRadius: 2,
-          boxShadow: 'none',
-        }}
-      >
-        <CardContent sx={{ p: 2.5 }}>
-          <Typography
-            variant="subtitle1"
-            sx={{
-              fontWeight: 600,
-              color: SECONDARY_COLOR,
-              mb: 2,
-            }}
-          >
-            Price Breakdown
-          </Typography>
+        {/* Materials & Cost Breakdown */}
+        <Box>
+          <Card sx={{ ...cardStyle, bgcolor: alpha(PRIMARY_COLOR, 0.08) }}>
+            <CardContent>
+              <Typography variant="subtitle2" sx={{ color: PRIMARY_COLOR, fontWeight: 600, mb: 2 }}>
+                Cost Breakdown
+              </Typography>
+              
+              <Stack spacing={1.5}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="body2">
+                    Base: {baseMaterial?.label} ({formatPrice(baseMaterial?.pricePerSqFt || 0)}/sq ft)
+                  </Typography>
+                  <Typography variant="body2" fontWeight={500}>
+                    {formatPrice(area * (baseMaterial?.pricePerSqFt || 0))}
+                  </Typography>
+                </Box>
 
-          <Stack spacing={2}>
-            {/* Base Rate */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                Base Rate per Sq Ft
-              </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                ₹{ratePerSqFt.toFixed(2)}
-              </Typography>
-            </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="body2">
+                    Aesthetic: {aesthetic?.label} ({formatPrice(aesthetic?.pricePerSqFt || 0)}/sq ft)
+                  </Typography>
+                  <Typography variant="body2" fontWeight={500}>
+                    {formatPrice(area * (aesthetic?.pricePerSqFt || 0))}
+                  </Typography>
+                </Box>
 
-            {/* Area Multiplier */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                Area ({area.toFixed(2)} sq ft)
-              </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                ₹{(ratePerSqFt * area).toFixed(2)}
-              </Typography>
-            </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="body2">
+                    Hardware: {hardware?.label}
+                  </Typography>
+                  <Typography variant="body2" fontWeight={500}>
+                    {formatPrice(hardwarePrice)}
+                  </Typography>
+                </Box>
 
-            <Divider sx={{ my: 1 }} />
+                <Divider sx={{ my: 1 }} />
 
-            {/* Total Price */}
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                p: 2,
-                backgroundColor: alpha(SECONDARY_COLOR, 0.1),
-                borderRadius: 1,
-              }}
-            >
-              <Typography
-                variant="subtitle2"
-                sx={{
-                  fontWeight: 700,
-                  color: SECONDARY_COLOR,
-                }}
-              >
-                Total Price
-              </Typography>
-              <Typography
-                sx={{
-                  fontSize: '1.75rem',
-                  fontWeight: 700,
-                  color: SECONDARY_COLOR,
-                }}
-              >
-                ₹{state.price.toLocaleString()}
-              </Typography>
-            </Box>
-          </Stack>
-        </CardContent>
-      </Card>
-
-      {/* Action Buttons */}
-      <Stack direction="row" spacing={2} sx={{ mt: 'auto' }}>
-        <Button
-          variant="outlined"
-          onClick={backToConfig}
-          fullWidth
-          sx={{
-            borderColor: PRIMARY_COLOR,
-            color: PRIMARY_COLOR,
-            textTransform: 'none',
-            py: 1.2,
-            fontSize: '1rem',
-            fontWeight: 600,
-            '&:hover': {
-              backgroundColor: alpha(PRIMARY_COLOR, 0.1),
-              borderColor: PRIMARY_COLOR,
-            },
-          }}
-        >
-          Modify Configuration
-        </Button>
-        <Button
-          variant="contained"
-          fullWidth
-          sx={{
-            background: `linear-gradient(135deg, ${PRIMARY_COLOR} 0%, ${alpha(PRIMARY_COLOR, 0.8)} 100%)`,
-            textTransform: 'none',
-            py: 1.2,
-            fontSize: '1rem',
-            fontWeight: 600,
-            boxShadow: `0 8px 24px ${alpha(PRIMARY_COLOR, 0.3)}`,
-            '&:hover': {
-              background: `linear-gradient(135deg, ${alpha(PRIMARY_COLOR, 0.9)} 0%, ${alpha(PRIMARY_COLOR, 0.7)} 100%)`,
-              boxShadow: `0 12px 32px ${alpha(PRIMARY_COLOR, 0.4)}`,
-            },
-          }}
-        >
-          Confirm & Proceed
-        </Button>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography variant="h6" fontWeight={700}>Total Estimated Cost</Typography>
+                  <Typography variant="h5" fontWeight={700} color="primary">
+                    {formatPrice(state.price)}
+                  </Typography>
+                </Box>
+              </Stack>
+            </CardContent>
+          </Card>
+        </Box>
       </Stack>
     </Box>
   );
 };
-
