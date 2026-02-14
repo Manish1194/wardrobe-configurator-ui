@@ -4,8 +4,8 @@
  */
 
 import React, { useMemo } from 'react';
-import { Group, Mesh } from 'three';
-import { AESTHETIC_OPTIONS, COLOR_VARIANTS, BASE_MATERIAL_OPTIONS } from '../../constants/wardrobe';
+import { Group } from 'three';
+import { AESTHETIC_OPTIONS, COLOR_VARIANTS } from '../../constants/wardrobe';
 import { WardrobeDimensions, MaterialConfig, InnerStructure, OuterStructure, ViewSide, ProductType } from '../../types/wardrobe';
 import { convertToDecimalFeet } from '../../utils/pricingEngine';
 
@@ -167,8 +167,8 @@ export const Wardrobe3D = React.forwardRef<Group, Wardrobe3DProps>(
       const yPos = height - THICKNESS_FT - 0.5; // 6 inches from top
       
       return (
-        <mesh position={[0, yPos, 0]} castShadow receiveShadow>
-          <cylinderGeometry args={[rodRadius, rodRadius, width - 2 * THICKNESS_FT, 16]} rotation={[0, 0, Math.PI / 2]} />
+        <mesh position={[0, yPos, 0]} castShadow receiveShadow rotation={[0, 0, Math.PI / 2]}>
+          <cylinderGeometry args={[rodRadius, rodRadius, width - 2 * THICKNESS_FT, 16]} />
           <meshStandardMaterial color="#aaaaaa" metalness={0.8} roughness={0.2} />
         </mesh>
       );

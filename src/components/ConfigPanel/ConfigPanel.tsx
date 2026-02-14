@@ -42,7 +42,7 @@ export const ConfigPanel: React.FC = () => {
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        background: `linear-gradient(180deg, #FFFFFF 0%, #F8F9FA 100%)`,
+        background: `linear-gradient(180deg, ${THEME_COLORS.surface} 0%, ${THEME_COLORS.background} 100%)`,
       }}
     >
       {/* Header Section */}
@@ -51,7 +51,7 @@ export const ConfigPanel: React.FC = () => {
           variant="h5"
           sx={{
             fontWeight: 700,
-            color: THEME_COLORS.primary,
+            color: THEME_COLORS.textPrimary,
             fontSize: '1.25rem',
           }}
         >

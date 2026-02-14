@@ -54,18 +54,20 @@ export const COLOR_VARIANTS = [
 ];
 
 export const THEME_COLORS = {
-  primary: '#2E7D32',
-  primaryLight: '#4CAF50',
-  primaryDark: '#1B5E20',
-  secondary: '#D32F2F',
-  secondaryLight: '#EF5350',
-  secondaryDark: '#B71C1C',
-  background: '#F5F5F5',
+  primary: '#DD2681',
+  primaryLight: '#FF5FAE',
+  primaryDark: '#B81E6A',
+  secondary: '#FF7A00',
+  secondaryLight: '#FFB86E',
+  secondaryDark: '#E86600',
+  background: '#FAFAFA',
   surface: '#FFFFFF',
   textPrimary: '#212121',
-  textSecondary: '#757575',
+  textSecondary: '#616161',
   border: '#E0E0E0',
-  skyBlue: '#E3F2FD',
+  skyBlue: '#F5F7FA',
+  brandGradientFrom: '#DD2681',
+  brandGradientTo: '#FF7A00',
 };
 
 export const DIMENSION_CONSTRAINTS = {

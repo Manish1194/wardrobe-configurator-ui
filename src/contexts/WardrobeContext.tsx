@@ -102,7 +102,7 @@ export const WardrobeProvider: React.FC<WardrobeProviderProps> = ({ children }) 
              drawers: 2
            };
         }
-      }
+      } 
 
       return { 
         ...prev, 
