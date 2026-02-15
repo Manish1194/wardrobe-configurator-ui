@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { Box, Typography, Button, ToggleButton, ToggleButtonGroup, Stack, TextField, FormControl, Slider, Card, CardContent, alpha, Switch, FormControlLabel, FormLabel, Divider, Select, MenuItem } from '@mui/material';
+import { Box, Typography, Button, ToggleButton, ToggleButtonGroup, Stack, TextField, FormControl, Slider, Card, CardContent, alpha, Switch, FormControlLabel, FormLabel, Divider, Select, MenuItem, Dialog, DialogTitle, DialogContent, IconButton } from '@mui/material';
 import { useWardrobe } from '../../hooks/useWardrobe';
 import { THEME_COLORS, COLOR_VARIANTS, AESTHETIC_OPTIONS } from '../../constants/wardrobe';
 import { AestheticType } from '../../types/wardrobe';
@@ -7,6 +7,7 @@ import { AestheticType } from '../../types/wardrobe';
 export const Step2_Structure: React.FC = () => {
   const { state, setStep, setInnerStructure, setOuterStructure, setStructureMode, setMaterialConfig, setInnerPartitions } = useWardrobe();
   const [activePartition, setActivePartition] = useState(0);
+  const [materialHelpOpen, setMaterialHelpOpen] = useState(false);
 
   const partitionsCount = useMemo(() => {
     const w = state.dimensions.widthFeet || 3;
@@ -209,21 +210,7 @@ export const Step2_Structure: React.FC = () => {
                 />
               </Box>
 
-              <Box>
-                <Typography gutterBottom variant="body2" color="text.secondary">
-                  Hangings: {(state.innerPartitions?.[activePartition]?.hangings) ?? state.innerStructure.hangings}
-                </Typography>
-                <Slider
-                  value={(state.innerPartitions?.[activePartition]?.hangings) ?? state.innerStructure.hangings}
-                  onChange={(_, val) => setPartitionCounts({ hangings: val as number })}
-                  step={1}
-                  min={0}
-                  max={5}
-                  marks
-                  valueLabelDisplay="auto"
-                  sx={{ color: THEME_COLORS.primary }}
-                />
-              </Box>
+              
 
               <Box>
                 <Typography gutterBottom variant="body2" color="text.secondary">
@@ -238,6 +225,15 @@ export const Step2_Structure: React.FC = () => {
                   marks
                   valueLabelDisplay="auto"
                   sx={{ color: THEME_COLORS.primary }}
+                />
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'start' }}>
+                <Typography variant="body2" color="text.secondary">
+                  Hanging rod
+                </Typography>
+                <Switch
+                  checked={(((state.innerPartitions?.[activePartition]?.hangings) ?? state.innerStructure.hangings) || 0) > 0}
+                  onChange={(_, checked) => setPartitionCounts({ hangings: checked ? 1 : 0 })}
                 />
               </Box>
 
@@ -278,12 +274,23 @@ export const Step2_Structure: React.FC = () => {
           </CardContent>
         </Card>
       ) : (
+        <>
         <Stack spacing={2}>
           <Card sx={cardStyle}>
             <CardContent sx={{ p: 2 }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: THEME_COLORS.primary }}>
-                Exterior Options
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 600, color: THEME_COLORS.primary }}>
+                  Exterior Options
+                </Typography>
+                <Button
+                  variant="text"
+                  size="small"
+                  sx={{ textTransform: 'none' }}
+                  onClick={() => setMaterialHelpOpen(true)}
+                >
+                  Wonder, how to choose the material.
+                </Button>
+              </Box>
               <Stack spacing={2}>
                 {/* <FormControl fullWidth size="small" sx={{ bgcolor: 'white' }}>
                   <InputLabel>Opening Type</InputLabel>
@@ -444,8 +451,33 @@ export const Step2_Structure: React.FC = () => {
               </Stack>
             </CardContent>
           </Card>
-
         </Stack>
+        <Dialog
+          open={materialHelpOpen}
+          onClose={() => setMaterialHelpOpen(false)}
+          maxWidth="md"
+          fullWidth
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pr: 1 }}>
+            <DialogTitle sx={{ pb: 1 }}>
+              How to choose the right material
+            </DialogTitle>
+            <IconButton onClick={() => setMaterialHelpOpen(false)}>
+              <span>✕</span>
+            </IconButton>
+          </Box>
+          <DialogContent sx={{ pt: 0 }}>
+            <Box
+              component="iframe"
+              src="https://www.youtube.com/embed/RGfNoUy1eqo"
+              title="How to choose the right finish"
+              sx={{ width: '100%', aspectRatio: '16 / 9', border: 0 }}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </DialogContent>
+        </Dialog>
+        </>
       )}
 
       {/* Navigation Buttons */}
@@ -468,7 +500,7 @@ export const Step2_Structure: React.FC = () => {
             '&:hover': { bgcolor: THEME_COLORS.primaryDark }
           }}
         >
-          Next: Material Selection
+          Next: Pricing
         </Button>
       </Box>
     </Stack>

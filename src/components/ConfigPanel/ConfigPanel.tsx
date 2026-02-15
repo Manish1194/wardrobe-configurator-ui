@@ -17,7 +17,7 @@ import { Step3_Customization } from './Step3_Customization';
  */
 export const ConfigPanel: React.FC = () => {
   const { state } = useWardrobe();
-  const steps = ['Dimensions', 'Designing', 'Material Selection'];
+  const steps = ['Dimensions', 'Designing', 'Pricing'];
 
   const renderStepContent = (step: number) => {
     switch (step) {

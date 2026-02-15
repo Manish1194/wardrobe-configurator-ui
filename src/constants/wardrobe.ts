@@ -76,6 +76,42 @@ export const THEME_COLORS = {
   brandGradientTo: '#FF7A00',
 };
 
+export const PRICING_TIERS = [
+  {
+    id: 'budget',
+    label: 'Budget',
+    carcaseMaterialLabel: 'Particle board',
+    carcaseRatePerSqFt: 400,
+    hardwareCompanyLabel: 'Imported (non-branded)',
+    drawerRate: 800,
+    lightRate: 100,
+    handleRate: 200,
+    hingeRate: 500,
+  },
+  {
+    id: 'premium',
+    label: 'Premium',
+    carcaseMaterialLabel: 'HDHMR',
+    carcaseRatePerSqFt: 500,
+    hardwareCompanyLabel: 'Hafele',
+    drawerRate: 1200,
+    lightRate: 1000,
+    handleRate: 500,
+    hingeRate: 1000,
+  },
+  {
+    id: 'luxury',
+    label: 'Luxury',
+    carcaseMaterialLabel: 'BWP Ply',
+    carcaseRatePerSqFt: 800,
+    hardwareCompanyLabel: 'Salice',
+    drawerRate: 1800,
+    lightRate: 1500,
+    handleRate: 1500,
+    hingeRate: 1200,
+  },
+];
+
 export const DIMENSION_CONSTRAINTS = {
   feet: { min: 0, max: 20, step: 1 },
   inches: { min: 0, max: 11, step: 1 },

@@ -44,6 +44,10 @@ export interface MaterialConfig {
   aestheticColor: string;
   aestheticDesign?: string;
   hardwareBrand: HardwareBrandType;
+  pricingMode?: 'auto' | 'custom';
+  autoPackage?: 'budget' | 'premium' | 'luxury';
+  carcaseTier?: 'budget' | 'premium' | 'luxury';
+  hardwareTier?: 'budget' | 'premium' | 'luxury';
   exteriorDesign?: 'pu_panel' | 'wood_glass' | 'aluminium_glass';
   exteriorColors?: { c1: string; c2: string; c3: string };
 }

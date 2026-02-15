@@ -27,11 +27,11 @@ export const Header: React.FC = () => {
             {APP_CONFIG.appName}
           </Typography>
           <Box sx={{ flex: 1 }} />
-          <Button size="small" variant="text" sx={{ mr: 1 }} onClick={() => {}}>
+          {/* <Button size="small" variant="text" sx={{ mr: 1 }} onClick={() => {}}>
             Meet a Designer
-          </Button>
+          </Button> */}
           <Button size="small" variant="contained" color="primary" onClick={() => navigate('/design')}>
-            Start Designing
+            Book Free Consultation
           </Button>
         </Toolbar>
       </Container>

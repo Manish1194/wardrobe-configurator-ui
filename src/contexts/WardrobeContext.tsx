@@ -27,10 +27,15 @@ interface WardrobeProviderProps {
 
 const INITIAL_MATERIAL_CONFIG: MaterialConfig = {
   baseMaterial: 'particle_board',
-  baseColor: 'oak', // Default changed from white to oak for better visibility
+  baseColor: 'oak',
   aesthetic: 'laminate',
-  aestheticColor: 'oak', // Default changed from white to oak
+  aestheticDesign: 'solid_plain',
+  aestheticColor: 'grey',
   hardwareBrand: 'hafele',
+  pricingMode: 'auto',
+  autoPackage: 'budget',
+  carcaseTier: 'budget',
+  hardwareTier: 'budget',
 };
 
 const INITIAL_INNER_STRUCTURE: InnerStructure = {
@@ -43,6 +48,7 @@ const INITIAL_OUTER_STRUCTURE: OuterStructure = {
   doors: 2,
   openingType: 'slide',
   design: 'Modern',
+  loft: true,
 };
 
 /**
@@ -72,9 +78,9 @@ export const WardrobeProvider: React.FC<WardrobeProviderProps> = ({ children }) 
   useEffect(() => {
     setState((prevState) => ({
       ...prevState,
-      price: calculatePrice(prevState.dimensions, prevState.materialConfig),
+      price: calculatePrice(prevState),
     }));
-  }, [state.dimensions, state.materialConfig]);
+  }, [state.dimensions, state.materialConfig, state.innerStructure, state.innerPartitions, state.outerStructure]);
 
   const setStep = useCallback((step: number) => {
     setState((prev) => ({

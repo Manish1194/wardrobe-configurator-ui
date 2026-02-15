@@ -50,7 +50,7 @@ export const Wardrobe3D = React.forwardRef<Group, Wardrobe3DProps>(
 
     const legitRough = (r: number) => Math.min(1, Math.max(0, r));
 
-    const loftHeight = outerStructure.loft ? Math.min(2, height * 0.3) : 0;
+    const loftHeight = outerStructure.loft ? Math.min(1, height * 0.3) : 0;
 
     const renderCarcass = () => (
       <group>
@@ -99,7 +99,7 @@ export const Wardrobe3D = React.forwardRef<Group, Wardrobe3DProps>(
       const availableHeight = height - loftHeight - (2 * THICKNESS_FT);
       const drawerHeight = innerStructure.drawers > 0 ? (innerStructure.drawers * 0.8) : 0; 
       const shelfSpaceHeight = availableHeight - drawerHeight;
-      const shelfSpacing = shelfSpaceHeight / (innerStructure.shelves + 1);
+      const shelfSpacing = shelfSpaceHeight / (innerStructure.shelves + 2);
 
       // Sneakers Storage: Slanted shelves
       const isSneakerRack = productType === 'sneakers_storage';
@@ -180,18 +180,18 @@ export const Wardrobe3D = React.forwardRef<Group, Wardrobe3DProps>(
     };
     
     const renderHangings = () => {
-      // Bar Unit and Sneakers Storage do not have hangings
       if (productType !== 'wardrobe') return null;
       if (innerStructure.hangings <= 0) return null;
       
-      const rodRadius = 0.05; // ft
-      const yPos = height - loftHeight - THICKNESS_FT - 0.5; // 6 inches below loft/top
+      const rodRadius = 0.05;
+      const minRodHeightFt = 2.5;
+      const rawY = height - loftHeight - THICKNESS_FT - 0.5;
+      const yPos = Math.max(minRodHeightFt, rawY);
       
       return (
         <mesh position={[0, yPos, 0]} castShadow receiveShadow rotation={[0, 0, Math.PI / 2]}>
           <cylinderGeometry args={[rodRadius, rodRadius, width - 2 * THICKNESS_FT, 16]} />
           <meshStandardMaterial color="#aaaaaa" metalness={0.8} roughness={0.2} />
-          {/* Light near hanging area */}
           {outerStructure.lights && (
             <pointLight position={[0, 0, depth/4]} color="#fff3c4" intensity={1} distance={depth} />
           )}
@@ -244,12 +244,26 @@ export const Wardrobe3D = React.forwardRef<Group, Wardrobe3DProps>(
         const pDrawers = pConfig.drawers;
         const pHang = pConfig.hangings > 0 ? 1 : 0;
 
-        // Shelves in partition
         if (pShelves > 0) {
-          const availableHeight = height - loftHeight - 2 * THICKNESS_FT - (pDrawers > 0 ? pDrawers * 0.8 : 0);
-          const shelfSpacing = availableHeight / (pShelves + 1);
+          const drawerHeight = 0.8;
+          const drawersHeight = pDrawers > 0 ? pDrawers * drawerHeight : 0;
+          const baseY = THICKNESS_FT + drawersHeight;
+
+          let shelfSpaceHeight: number;
+          if (pHang > 0) {
+            const minRodHeightFt = 2.5;
+            const rawRodY = height - loftHeight - THICKNESS_FT - 0.5;
+            const rodY = Math.max(minRodHeightFt, rawRodY);
+            const hangingZoneHeight = 2.5;
+            const zoneBottomY = rodY - hangingZoneHeight;
+            shelfSpaceHeight = Math.max(0, zoneBottomY - baseY);
+          } else {
+            shelfSpaceHeight = height - loftHeight - 2 * THICKNESS_FT - drawersHeight;
+          }
+
+          const shelfSpacing = shelfSpaceHeight / (pShelves + 1 || 1);
           for (let s = 0; s < pShelves; s++) {
-            const yPos = THICKNESS_FT + (pDrawers > 0 ? pDrawers * 0.8 : 0) + shelfSpacing * (s + 1);
+            const yPos = baseY + shelfSpacing * (s + 1);
             groups.push(
               <mesh key={`p${i}-s${s}`} position={[centerX, yPos, 0]} castShadow receiveShadow>
                 <boxGeometry args={[partitionWidth - 2 * THICKNESS_FT, THICKNESS_FT, depth - THICKNESS_FT]} />
@@ -288,10 +302,11 @@ export const Wardrobe3D = React.forwardRef<Group, Wardrobe3DProps>(
             </group>
           );
         }
-        // Hanging rod near top
         if (pHang > 0) {
           const rodRadius = 0.05;
-          const yPos = height - loftHeight - THICKNESS_FT - 0.5;
+          const minRodHeightFt = 2.5;
+          const rawY = height - loftHeight - THICKNESS_FT - 0.5;
+          const yPos = Math.max(minRodHeightFt, rawY);
           groups.push(
             <mesh key={`p${i}-h`} position={[centerX, yPos, 0]} castShadow receiveShadow rotation={[0, 0, Math.PI / 2]}>
               <cylinderGeometry args={[rodRadius, rodRadius, partitionWidth - 2 * THICKNESS_FT, 16]} />

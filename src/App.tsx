@@ -15,6 +15,7 @@ import { THEME_COLORS } from './constants/wardrobe';
 import { Header } from './components/Layout/Header';
 import { LandingPage } from './components/Pages/LandingPage';
 import { Routes, Route } from 'react-router-dom';
+import { ProductionConfirmationPage } from './components/Pages/ProductionConfirmationPage';
 
 /**
  * Material-UI Theme Configuration
@@ -145,6 +146,7 @@ function App() {
             <Routes>
               <Route path="/" element={<LandingPage />} />
               <Route path="/design" element={<MainLayout />} />
+              <Route path="/production-confirmation" element={<ProductionConfirmationPage />} />
             </Routes>
           </Box>
         </Box>

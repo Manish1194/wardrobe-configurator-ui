@@ -1,9 +1,7 @@
 import React from 'react';
 import { Box, Typography, Button, Radio, RadioGroup, FormControlLabel, FormControl, FormLabel, Stack, Card, CardContent, alpha, Select, MenuItem } from '@mui/material';
 import { useWardrobe } from '../../hooks/useWardrobe';
-import { THEME_COLORS, BASE_MATERIAL_OPTIONS, HARDWARE_OPTIONS } from '../../constants/wardrobe';
-import { BaseMaterialType, HardwareBrandType } from '../../types/wardrobe';
-import { formatPrice } from '../../utils/pricingEngine';
+import { THEME_COLORS, PRICING_TIERS } from '../../constants/wardrobe';
 
 export const Step3_Customization: React.FC = () => {
   const { state, setStep, setMaterialConfig, generateQuote } = useWardrobe();
@@ -19,135 +17,172 @@ export const Step3_Customization: React.FC = () => {
 
   return (
     <Stack spacing={2} sx={{ p: 1, maxWidth: 720, mx: 'auto', width: '100%'  }}>
-      
-      {/* Base Material */}
-      <Card sx={cardStyle}>
-        <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-          <FormControl fullWidth size="small">
-            <FormLabel component="legend" sx={{ color: THEME_COLORS.primary, fontWeight: 600, mb: 1 }}>Base Material</FormLabel>
-            <Select
-              value={state.materialConfig.baseMaterial}
-              onChange={(e) => setMaterialConfig({ baseMaterial: e.target.value as BaseMaterialType })}
-            >
-              {BASE_MATERIAL_OPTIONS.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label} (₹{option.pricePerSqFt}/sq ft)
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          {/* <Typography variant="caption" sx={{ mb: 1, display: 'block', fontWeight: 600, color: 'text.secondary' }}>Internal Color</Typography>
-          <Stack direction="row" spacing={1.5} sx={{ overflowX: 'auto', pb: 0.5 }}>
-            {COLOR_VARIANTS.map((color) => (
-              <Box
-                key={color.value}
-                onClick={() => setMaterialConfig({ baseColor: color.value })}
-                sx={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: '50%',
-                  bgcolor: color.hex,
-                  border: state.materialConfig.baseColor === color.value ? `3px solid ${THEME_COLORS.primary}` : '1px solid #ddd',
-                  boxShadow: state.materialConfig.baseColor === color.value ? '0 0 0 2px white inset' : 'none',
-                  cursor: 'pointer',
-                  flexShrink: 0,
-                  transition: 'all 0.2s',
-                  '&:hover': { transform: 'scale(1.1)' }
-                }}
-                title={color.label}
-              />
-            ))}
-          </Stack> */}
-        </CardContent>
-      </Card>
-
-      {/* Aesthetic */}
-      {/* <Card sx={cardStyle}>
-        <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-          <FormControl component="fieldset" fullWidth>
-            <FormLabel component="legend" sx={{ color: THEME_COLORS.primary, fontWeight: 600, mb: 1 }}>Aesthetics (Finish)</FormLabel>
-            <RadioGroup
-              value={state.materialConfig.aesthetic}
-              onChange={(e) => setMaterialConfig({ aesthetic: e.target.value as AestheticType })}
-            >
-              {AESTHETIC_OPTIONS.map((option) => (
-                <FormControlLabel 
-                  key={option.value} 
-                  value={option.value} 
-                  control={<Radio size="small" sx={{ color: THEME_COLORS.primary, '&.Mui-checked': { color: THEME_COLORS.primary } }} />} 
-                  label={<Typography variant="body2">{option.label} (₹{option.pricePerSqFt}/sq ft)</Typography>} 
-                />
-              ))}
-            </RadioGroup>
-          </FormControl>
-
-          <Divider sx={{ my: 1.5 }} />
-          
-          <Typography variant="caption" sx={{ mb: 1, display: 'block', fontWeight: 600, color: 'text.secondary' }}>Finish Color</Typography>
-          <Stack direction="row" spacing={1.5} sx={{ overflowX: 'auto', pb: 0.5 }}>
-            {COLOR_VARIANTS.map((color) => (
-              <Box
-                key={color.value}
-                onClick={() => setMaterialConfig({ aestheticColor: color.value })}
-                sx={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: '50%',
-                  bgcolor: color.hex,
-                  border: state.materialConfig.aestheticColor === color.value ? `3px solid ${THEME_COLORS.primary}` : '1px solid #ddd',
-                  boxShadow: state.materialConfig.aestheticColor === color.value ? '0 0 0 2px white inset' : 'none',
-                  cursor: 'pointer',
-                  flexShrink: 0,
-                  transition: 'all 0.2s',
-                  '&:hover': { transform: 'scale(1.1)' }
-                }}
-                title={color.label}
-              />
-            ))}
-          </Stack>
-        </CardContent>
-      </Card> */}
-
-      {/* Hardware */}
       <Card sx={cardStyle}>
         <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
           <FormControl component="fieldset" fullWidth>
-            <FormLabel component="legend" sx={{ color: THEME_COLORS.primary, fontWeight: 600, mb: 1 }}>Hardware</FormLabel>
+            <FormLabel component="legend" sx={{ color: THEME_COLORS.primary, fontWeight: 600, mb: 1 }}>
+              How would you like to get your quote?
+            </FormLabel>
             <RadioGroup
-              value={state.materialConfig.hardwareBrand}
-              onChange={(e) => setMaterialConfig({ hardwareBrand: e.target.value as HardwareBrandType })}
+              row
+              value={state.materialConfig.pricingMode || 'auto'}
+              onChange={(e) =>
+                setMaterialConfig({
+                  pricingMode: e.target.value as 'auto' | 'custom',
+                })
+              }
             >
-              {HARDWARE_OPTIONS.map((option) => (
-                <FormControlLabel 
-                  key={option.value} 
-                  value={option.value} 
-                  control={<Radio size="small" sx={{ color: THEME_COLORS.primary, '&.Mui-checked': { color: THEME_COLORS.primary } }} />} 
-                  label={<Typography variant="body2">{option.label}</Typography>} 
-                />
-              ))}
+              <FormControlLabel
+                value="auto"
+                control={
+                  <Radio
+                    size="small"
+                    sx={{
+                      color: THEME_COLORS.primary,
+                      '&.Mui-checked': { color: THEME_COLORS.primary },
+                    }}
+                  />
+                }
+                label={<Typography variant="body2">Auto</Typography>}
+              />
+              <FormControlLabel
+                value="custom"
+                control={
+                  <Radio
+                    size="small"
+                    sx={{
+                      color: THEME_COLORS.primary,
+                      '&.Mui-checked': { color: THEME_COLORS.primary },
+                    }}
+                  />
+                }
+                label={<Typography variant="body2">Customize your quote</Typography>}
+              />
             </RadioGroup>
           </FormControl>
         </CardContent>
       </Card>
 
-      {/* Price Display */}
-      {/* <Card 
-        elevation={0}
-        sx={{ 
-          bgcolor: THEME_COLORS.skyBlue, 
-          border: `1px solid ${THEME_COLORS.primary}`,
-          textAlign: 'center',
-          mt: 2
-        }}
-      >
-        <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-          <Typography variant="body2" color="text.secondary" gutterBottom>Estimated Total Cost</Typography>
-          <Typography variant="h4" sx={{ color: THEME_COLORS.primary, fontWeight: 700 }}>
-            {formatPrice(state.price)}
-          </Typography>
-        </CardContent>
-      </Card> */}
+      {state.materialConfig.pricingMode !== 'custom' && (
+        <Card sx={cardStyle}>
+          <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+            <FormControl component="fieldset" fullWidth>
+              <FormLabel
+                component="legend"
+                sx={{ color: THEME_COLORS.primary, fontWeight: 600, mb: 1 }}
+              >
+                Auto package
+              </FormLabel>
+              <RadioGroup
+                row
+                value={state.materialConfig.autoPackage || 'budget'}
+                onChange={(e) =>
+                  setMaterialConfig({
+                    autoPackage: e.target.value as 'budget' | 'premium' | 'luxury',
+                    carcaseTier: e.target.value as 'budget' | 'premium' | 'luxury',
+                    hardwareTier: e.target.value as 'budget' | 'premium' | 'luxury',
+                  })
+                }
+              >
+                {PRICING_TIERS.map((tier) => (
+                  <FormControlLabel
+                    key={tier.id}
+                    value={tier.id}
+                    control={
+                      <Radio
+                        size="small"
+                        sx={{
+                          color: THEME_COLORS.primary,
+                          '&.Mui-checked': { color: THEME_COLORS.primary },
+                        }}
+                      />
+                    }
+                    label={<Typography variant="body2">{tier.label}</Typography>}
+                  />
+                ))}
+              </RadioGroup>
+            </FormControl>
+
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 0.5 }}>
+                Selected materials
+              </Typography>
+              {(() => {
+                const tier = PRICING_TIERS.find(
+                  (t) => t.id === (state.materialConfig.autoPackage || 'budget')
+                ) || PRICING_TIERS[0];
+                return (
+                  <>
+                    <Typography variant="body2">
+                      Carcase material: {tier.carcaseMaterialLabel}
+                    </Typography>
+                    <Typography variant="body2">
+                      Shutter finish: {state.materialConfig.aesthetic}
+                    </Typography>
+                    <Typography variant="body2">
+                      Hardware company: {tier.hardwareCompanyLabel}
+                    </Typography>
+                  </>
+                );
+              })()}
+            </Box>
+          </CardContent>
+        </Card>
+      )}
+
+      {state.materialConfig.pricingMode === 'custom' && (
+        <Card sx={cardStyle}>
+          <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+            <Stack spacing={2}>
+              <FormControl fullWidth size="small">
+                <FormLabel
+                  component="legend"
+                  sx={{ color: THEME_COLORS.primary, fontWeight: 600, mb: 1 }}
+                >
+                  Carcase
+                </FormLabel>
+                <Select
+                  value={state.materialConfig.carcaseTier || 'budget'}
+                  onChange={(e) =>
+                    setMaterialConfig({
+                      carcaseTier: e.target.value as 'budget' | 'premium' | 'luxury',
+                    })
+                  }
+                >
+                  {PRICING_TIERS.map((tier) => (
+                    <MenuItem key={tier.id} value={tier.id}>
+                      {tier.label} – {tier.carcaseMaterialLabel}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth size="small">
+                <FormLabel
+                  component="legend"
+                  sx={{ color: THEME_COLORS.primary, fontWeight: 600, mb: 1 }}
+                >
+                  Hardware
+                </FormLabel>
+                <Select
+                  value={state.materialConfig.hardwareTier || 'budget'}
+                  onChange={(e) =>
+                    setMaterialConfig({
+                      hardwareTier: e.target.value as 'budget' | 'premium' | 'luxury',
+                    })
+                  }
+                >
+                  {PRICING_TIERS.map((tier) => (
+                    <MenuItem key={tier.id} value={tier.id}>
+                      {tier.label} – {tier.hardwareCompanyLabel}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Stack>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Navigation Buttons */}
       <Box sx={{ mt: 'auto', pt: 2, pb: 2, display: 'flex', gap: 2 }}>

@@ -13,14 +13,14 @@ import { useWardrobe } from '../../hooks/useWardrobe';
 
 /**
  * MainLayout Component
- * Provides the main structure with 50/50 split between 3D view and dynamic right panel
+ * Provides the main structure with 70/30 split between 3D view and dynamic right panel
  * Right panel switches between ConfigPanel (config view) and QuotePage (quote view)
  */
 export const MainLayout: React.FC = () => {
   const { view, state } = useWardrobe();
   const stepOne = state.step === 1;
   const stepThree = state.step === 3;
-  const hideLeft = view === 'config' && (stepOne || stepThree);
+  const hideLeft = (view === 'config' && (stepOne || stepThree)) || view === 'quote';
 
   return (
     <Box
@@ -35,7 +35,7 @@ export const MainLayout: React.FC = () => {
       {!hideLeft && (
         <Box
           sx={{
-            width: '50%',
+            width: '70%',
             bgcolor: '#E3F2FD',
             overflow: 'hidden',
             position: 'relative',
@@ -50,7 +50,7 @@ export const MainLayout: React.FC = () => {
         </Box>
       )}
 
-      <Box sx={{ width: hideLeft ? '100%' : '50%', overflow: 'hidden' }}>
+      <Box sx={{ width: hideLeft ? '100%' : '30%', overflow: 'hidden' }}>
         {view === 'config' && <ConfigPanel />}
         {view === 'quote' && <QuotePage />}
       </Box>

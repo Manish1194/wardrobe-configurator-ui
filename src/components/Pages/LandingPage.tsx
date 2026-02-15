@@ -1,8 +1,9 @@
 import React from 'react';
-import { Box, Button, Card, CardActionArea, CardContent, Container, Stack, Typography } from '@mui/material';
+import { Box, Card, CardActionArea, CardContent, Container, Stack, Typography } from '@mui/material';
 import { THEME_COLORS, APP_CONFIG } from '../../constants/wardrobe';
 import { useWardrobe } from '../../hooks/useWardrobe';
 import { useNavigate } from 'react-router-dom';
+import mainHero from '../../assets/landingPage/main2.jpeg.png';
 
 const categories = [
   { key: 'wardrobe', title: 'Wardrobes', description: 'Sliding or hinged, tailored to your space', disabled: false },
@@ -25,8 +26,8 @@ export const LandingPage: React.FC = () => {
           display: 'flex',
           alignItems: 'center',
           backgroundImage: `
-            linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.45) 100%),
-            url('https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1600&q=80')
+            linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.30) 100%),
+            url(${mainHero})
           `,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
@@ -35,30 +36,36 @@ export const LandingPage: React.FC = () => {
         }}
       >
         <Container maxWidth="lg" sx={{ textAlign: 'center' }}>
-          <Stack spacing={2} sx={{ maxWidth: 900, mx: 'auto' }}>
+          <Stack spacing={2} sx={{ maxWidth: 1500, mx: 'auto' }}>
             <Typography
               variant="h3"
               sx={{
-                fontSize: { xs: '2.25rem', md: '3rem' },
+                fontSize: { xs: '2.75rem', md: '4.75rem' },
                 fontWeight: 900,
-                color: '#ffffff',
+                color: '#212121',
                 textShadow: '0 2px 14px rgba(0,0,0,0.35)',
                 letterSpacing: '0.5px',
               }}
             >
               {APP_CONFIG.appName}
             </Typography>
-            <Typography variant="body1" sx={{ color: '#f1f1f1' }}>
+            <Typography
+              variant="body1"
+              sx={{
+                color: '#212121',
+                fontSize: { xs: '1.1rem', md: '2.35rem' },
+              }}
+            >
               Configure in 3D, get instant pricing, and book a free consultation.
             </Typography>
-            <Stack direction="row" spacing={1.5}>
+            {/* <Stack direction="row" spacing={1.5}>
               <Button size="large" variant="contained" color="primary" onClick={goDesign}>
                 Start Designing
               </Button>
               <Button size="large" variant="outlined" color="secondary" sx={{ borderWidth: 2 }}>
                 Meet a Designer
               </Button>
-            </Stack>
+            </Stack> */}
           </Stack>
         </Container>
       </Box>
