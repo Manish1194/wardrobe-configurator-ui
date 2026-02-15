@@ -1,8 +1,8 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { Box, Typography, Button, ToggleButton, ToggleButtonGroup, Stack, TextField, FormControl, InputLabel, Select, MenuItem, Slider, Card, CardContent, alpha, Switch, FormControlLabel } from '@mui/material';
+import { Box, Typography, Button, ToggleButton, ToggleButtonGroup, Stack, TextField, FormControl, InputLabel, Select, MenuItem, Slider, Card, CardContent, alpha, Switch, FormControlLabel, FormLabel, Divider, Radio, RadioGroup } from '@mui/material';
 import { useWardrobe } from '../../hooks/useWardrobe';
-import { THEME_COLORS, BASE_MATERIAL_OPTIONS } from '../../constants/wardrobe';
-import { OpeningType } from '../../types/wardrobe';
+import { THEME_COLORS, BASE_MATERIAL_OPTIONS, AESTHETIC_OPTIONS, COLOR_VARIANTS } from '../../constants/wardrobe';
+import { BaseMaterialType, AestheticType, OpeningType } from '../../types/wardrobe';
 
 export const Step2_Structure: React.FC = () => {
   const { state, setStep, setInnerStructure, setOuterStructure, setStructureMode, setMaterialConfig, setInnerPartitions } = useWardrobe();
@@ -74,7 +74,7 @@ export const Step2_Structure: React.FC = () => {
               Internal Structure
             </Typography>
             <Stack spacing={2.5}>
-              <Box>
+              {/* <Box>
                 <Typography gutterBottom variant="body2" color="text.secondary">Base Material</Typography>
                 <FormControl size="small" fullWidth sx={{ bgcolor: 'white' }}>
                   <InputLabel>Base Material</InputLabel>
@@ -88,7 +88,52 @@ export const Step2_Structure: React.FC = () => {
                     ))}
                   </Select>
                 </FormControl>
-              </Box>
+              </Box> */}
+              {/* <Card sx={cardStyle}>
+                <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+                  <FormControl component="fieldset" fullWidth>
+                    <FormLabel component="legend" sx={{ color: THEME_COLORS.primary, fontWeight: 600, mb: 1 }}>Base Material</FormLabel>
+                    <RadioGroup
+                      value={state.materialConfig.baseMaterial}
+                      onChange={(e) => setMaterialConfig({ baseMaterial: e.target.value as BaseMaterialType })}
+                    >
+                      {BASE_MATERIAL_OPTIONS.map((option) => (
+                        <FormControlLabel
+                          key={option.value}
+                          value={option.value}
+                          control={<Radio size="small" sx={{ color: THEME_COLORS.primary, '&.Mui-checked': { color: THEME_COLORS.primary } }} />}
+                          label={<Typography variant="body2">{option.label} (₹{option.pricePerSqFt}/sq ft)</Typography>}
+                        />
+                      ))}
+                    </RadioGroup>
+                  </FormControl>
+
+                  <Divider sx={{ my: 1.5 }} />
+
+                  <Typography variant="caption" sx={{ mb: 1, display: 'block', fontWeight: 600, color: 'text.secondary' }}>Internal Color</Typography>
+                  <Stack direction="row" spacing={1.5} sx={{ overflowX: 'auto', pb: 0.5 }}>
+                    {COLOR_VARIANTS.map((color) => (
+                      <Box
+                        key={color.value}
+                        onClick={() => setMaterialConfig({ baseColor: color.value })}
+                        sx={{
+                          width: 28,
+                          height: 28,
+                          borderRadius: '50%',
+                          bgcolor: color.hex,
+                          border: state.materialConfig.baseColor === color.value ? `3px solid ${THEME_COLORS.primary}` : '1px solid #ddd',
+                          boxShadow: state.materialConfig.baseColor === color.value ? '0 0 0 2px white inset' : 'none',
+                          cursor: 'pointer',
+                          flexShrink: 0,
+                          transition: 'all 0.2s',
+                          '&:hover': { transform: 'scale(1.1)' }
+                        }}
+                        title={color.label}
+                      />
+                    ))}
+                  </Stack>
+                </CardContent>
+              </Card> */}
 
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                 <Typography variant="body2" color="text.secondary">Partitions: {partitionsCount}</Typography>
@@ -119,7 +164,7 @@ export const Step2_Structure: React.FC = () => {
                   sx={{ color: THEME_COLORS.primary }}
                 />
               </Box>
-              
+
               <Box>
                 <Typography gutterBottom variant="body2" color="text.secondary">
                   Hangings: {(state.innerPartitions?.[activePartition]?.hangings) ?? state.innerStructure.hangings}
@@ -196,7 +241,7 @@ export const Step2_Structure: React.FC = () => {
                 Exterior Options
               </Typography>
               <Stack spacing={2}>
-                <FormControl fullWidth size="small" sx={{ bgcolor: 'white' }}>
+                {/* <FormControl fullWidth size="small" sx={{ bgcolor: 'white' }}>
                   <InputLabel>Opening Type</InputLabel>
                   <Select
                     value={state.outerStructure.openingType}
@@ -206,8 +251,8 @@ export const Step2_Structure: React.FC = () => {
                     <MenuItem value="slide">Sliding</MenuItem>
                     <MenuItem value="shutter">Openable (Hinged)</MenuItem>
                   </Select>
-                </FormControl>
-                <FormControl fullWidth size="small" sx={{ bgcolor: 'white' }}>
+                </FormControl> */}
+                {/* <FormControl fullWidth size="small" sx={{ bgcolor: 'white' }}>
                   <InputLabel>Exterior Design</InputLabel>
                   <Select
                     value={state.materialConfig.exteriorDesign ?? 'pu_panel'}
@@ -244,7 +289,55 @@ export const Step2_Structure: React.FC = () => {
                     InputLabelProps={{ shrink: true }}
                     fullWidth
                   />
-                </Box>
+                </Box> */}
+                {/* Aesthetic */}
+                <Card sx={cardStyle}>
+                  <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+                    <FormControl component="fieldset" fullWidth>
+                      <FormLabel component="legend" sx={{ color: THEME_COLORS.primary, fontWeight: 600, mb: 1 }}>Aesthetics (Finish)</FormLabel>
+                      {/* show this radi group as grid with 2 columns  and 3 rows */}
+                      <RadioGroup
+                        value={state.materialConfig.aesthetic}
+                        onChange={(e) => setMaterialConfig({ aesthetic: e.target.value as AestheticType })}
+                        sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1 }}
+                      >
+                        {AESTHETIC_OPTIONS.map((option) => (
+                          <FormControlLabel
+                            key={option.value}
+                            value={option.value}
+                            control={<Radio size="small" sx={{ color: THEME_COLORS.primary, '&.Mui-checked': { color: THEME_COLORS.primary } }} />}
+                            label={<Typography variant="body2">{option.label} (₹{option.pricePerSqFt}/sq ft)</Typography>}
+                          />
+                        ))}
+                      </RadioGroup>
+                    </FormControl>
+
+                    <Divider sx={{ my: 1.5 }} />
+
+                    <Typography variant="caption" sx={{ mb: 1, display: 'block', fontWeight: 600, color: 'text.secondary' }}>Finish Color</Typography>
+                    <Stack direction="row" spacing={1.5} sx={{ overflowX: 'auto', pb: 0.5 }}>
+                      {COLOR_VARIANTS.map((color) => (
+                        <Box
+                          key={color.value}
+                          onClick={() => setMaterialConfig({ aestheticColor: color.value })}
+                          sx={{
+                            width: 28,
+                            height: 28,
+                            borderRadius: '50%',
+                            bgcolor: color.hex,
+                            border: state.materialConfig.aestheticColor === color.value ? `3px solid ${THEME_COLORS.primary}` : '1px solid #ddd',
+                            boxShadow: state.materialConfig.aestheticColor === color.value ? '0 0 0 2px white inset' : 'none',
+                            cursor: 'pointer',
+                            flexShrink: 0,
+                            transition: 'all 0.2s',
+                            '&:hover': { transform: 'scale(1.1)' }
+                          }}
+                          title={color.label}
+                        />
+                      ))}
+                    </Stack>
+                  </CardContent>
+                </Card>
                 <FormControlLabel
                   control={<Switch checked={!!state.outerStructure.handleless} onChange={(_, c) => setOuterStructure({ handleless: c })} />}
                   label="Handleless Doors"
@@ -253,49 +346,24 @@ export const Step2_Structure: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card sx={cardStyle}>
-            <CardContent sx={{ p: 0 }}>
-              <Box
-                sx={{
-                  height: 240,
-                  position: 'relative',
-                  borderRadius: 2,
-                  overflow: 'hidden',
-                  border: `1px solid ${alpha(THEME_COLORS.primary, 0.2)}`,
-                  backgroundImage: `
-                    linear-gradient(90deg, ${state.materialConfig.exteriorColors?.c1 ?? '#cccccc'}88, ${state.materialConfig.exteriorColors?.c2 ?? '#999999'}88),
-                    url('${(state.materialConfig.exteriorDesign ?? 'pu_panel') === 'pu_panel'
-                      ? 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1200&q=60'
-                      : (state.materialConfig.exteriorDesign === 'wood_glass'
-                        ? 'https://images.unsplash.com/photo-1616594039964-ae9021a98567?auto=format&fit=crop&w=1200&q=60'
-                        : 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1200&q=60')}')
-                  `,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }}
-              >
-                <Box sx={{ position: 'absolute', inset: 0, background: `linear-gradient(0deg, ${(state.materialConfig.exteriorColors?.c3 ?? '#666666')}44, transparent)` }} />
-              </Box>
-            </CardContent>
-          </Card>
         </Stack>
       )}
 
       {/* Navigation Buttons */}
       <Box sx={{ mt: 'auto', pt: 2, pb: 2, display: 'flex', gap: 2 }}>
-        <Button 
-          variant="outlined" 
-          fullWidth 
+        <Button
+          variant="outlined"
+          fullWidth
           onClick={() => setStep(1)}
           sx={{ borderColor: THEME_COLORS.primary, color: THEME_COLORS.primary }}
         >
           Back
         </Button>
-        <Button 
-          variant="contained" 
-          fullWidth 
+        <Button
+          variant="contained"
+          fullWidth
           onClick={() => setStep(3)}
-          sx={{ 
+          sx={{
             bgcolor: THEME_COLORS.primary,
             fontWeight: 600,
             '&:hover': { bgcolor: THEME_COLORS.primaryDark }

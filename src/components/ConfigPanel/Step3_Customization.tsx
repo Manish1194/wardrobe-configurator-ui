@@ -68,7 +68,7 @@ export const Step3_Customization: React.FC = () => {
       </Card>
 
       {/* Aesthetic */}
-      <Card sx={cardStyle}>
+      {/* <Card sx={cardStyle}>
         <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
           <FormControl component="fieldset" fullWidth>
             <FormLabel component="legend" sx={{ color: THEME_COLORS.primary, fontWeight: 600, mb: 1 }}>Aesthetics (Finish)</FormLabel>
@@ -112,7 +112,7 @@ export const Step3_Customization: React.FC = () => {
             ))}
           </Stack>
         </CardContent>
-      </Card>
+      </Card> */}
 
       {/* Hardware */}
       <Card sx={cardStyle}>

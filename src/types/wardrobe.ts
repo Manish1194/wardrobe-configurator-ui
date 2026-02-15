@@ -6,7 +6,7 @@
 export type ProductType = 'wardrobe' | 'bar_unit' | 'sneakers_storage' | 'modular_kitchen';
 
 export type BaseMaterialType = 'particle_board' | 'ply' | 'hdhmr';
-export type AestheticType = 'laminate' | 'membrane' | 'pu';
+export type AestheticType = 'laminate' | 'membrane' | 'pu' | 'Acrylic' | 'Wood and glass' | 'Aluminium and glass';
 export type HardwareBrandType = 'hafele' | 'blum';
 
 export type ViewSide = 'inner' | 'outer';

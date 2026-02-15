@@ -5,7 +5,7 @@
 
 import React, { useMemo } from 'react';
 import { Group } from 'three';
-import { AESTHETIC_OPTIONS, COLOR_VARIANTS } from '../../constants/wardrobe';
+import { COLOR_VARIANTS } from '../../constants/wardrobe';
 import { WardrobeDimensions, MaterialConfig, InnerStructure, OuterStructure, ViewSide, ProductType } from '../../types/wardrobe';
 import { convertToDecimalFeet } from '../../utils/pricingEngine';
 
@@ -39,15 +39,9 @@ export const Wardrobe3D = React.forwardRef<Group, Wardrobe3DProps>(
     const depth = useMemo(() => convertToDecimalFeet(dimensions.depthFeet, dimensions.depthInches), [dimensions.depthFeet, dimensions.depthInches]);
 
     // 2. Materials
-    const aestheticData = useMemo(() => AESTHETIC_OPTIONS.find((m) => m.value === config.aesthetic), [config.aesthetic]);
-    const aestheticColorData = useMemo(() => COLOR_VARIANTS.find((c) => c.value === config.aestheticColor), [config.aestheticColor]);
     const baseColorData = useMemo(() => COLOR_VARIANTS.find((c) => c.value === config.baseColor), [config.baseColor]);
 
-    const outerColorHex = aestheticColorData?.hex || '#ffffff';
     const innerColorHex = baseColorData?.hex || '#ffffff';
-    
-    const outerRoughness = aestheticData?.roughness ?? 0.5;
-    const outerMetalness = aestheticData?.metalness ?? 0;
     
     const innerRoughness = 0.8; // Standard interior roughness
     const innerMetalness = 0.1;
@@ -55,6 +49,8 @@ export const Wardrobe3D = React.forwardRef<Group, Wardrobe3DProps>(
     // --- Rendering Helpers ---
 
     const legitRough = (r: number) => Math.min(1, Math.max(0, r));
+
+    const loftHeight = outerStructure.loft ? Math.min(2, height * 0.3) : 0;
 
     const renderCarcass = () => (
       <group>
@@ -86,10 +82,21 @@ export const Wardrobe3D = React.forwardRef<Group, Wardrobe3DProps>(
       </group>
     );
 
+    const renderLoft = () => {
+      if (!outerStructure.loft) return null;
+      const shelfY = height - loftHeight;
+      return (
+        <mesh position={[0, shelfY, 0]} castShadow receiveShadow>
+          <boxGeometry args={[width - 2 * THICKNESS_FT, THICKNESS_FT, depth - THICKNESS_FT]} />
+          <meshStandardMaterial color={innerColorHex} roughness={innerRoughness} metalness={innerMetalness} />
+        </mesh>
+      );
+    };
+
     const renderShelves = () => {
       if (innerStructure.shelves <= 0) return null;
       
-      const availableHeight = height - (2 * THICKNESS_FT);
+      const availableHeight = height - loftHeight - (2 * THICKNESS_FT);
       const drawerHeight = innerStructure.drawers > 0 ? (innerStructure.drawers * 0.8) : 0; 
       const shelfSpaceHeight = availableHeight - drawerHeight;
       const shelfSpacing = shelfSpaceHeight / (innerStructure.shelves + 1);
@@ -145,8 +152,6 @@ export const Wardrobe3D = React.forwardRef<Group, Wardrobe3DProps>(
     };
 
     const renderDrawers = () => {
-      // Sneakers Storage usually doesn't have drawers, or very few. 
-      // Bar Unit might have them.
       if (innerStructure.drawers <= 0) return null;
       const drawerHeight = 0.8; // ft
       
@@ -154,10 +159,15 @@ export const Wardrobe3D = React.forwardRef<Group, Wardrobe3DProps>(
         const yPos = THICKNESS_FT + (i * drawerHeight) + (drawerHeight / 2);
         return (
           <group key={`drawer-${i}`} position={[0, yPos, 0]}>
-             {/* Drawer Front */}
+             {/* Drawer Front with top grip cut */}
              <mesh position={[0, 0, depth/2 - THICKNESS_FT/2]}>
-                <boxGeometry args={[width - 2.2 * THICKNESS_FT, drawerHeight - 0.05, THICKNESS_FT]} />
-                <meshStandardMaterial color={innerColorHex} roughness={innerRoughness} metalness={innerMetalness} />
+               <boxGeometry args={[width - 2.2 * THICKNESS_FT, drawerHeight - 0.05, THICKNESS_FT]} />
+               <meshStandardMaterial color={innerColorHex} roughness={innerRoughness} metalness={innerMetalness} />
+             </mesh>
+             {/* Grip recess */}
+             <mesh position={[0, drawerHeight/2 - 0.08, depth/2 - THICKNESS_FT/2 + 0.01]}>
+               <boxGeometry args={[width - 2.6 * THICKNESS_FT, 0.08, 0.04]} />
+               <meshStandardMaterial color="#2b2015" roughness={0.4} metalness={0.1} />
              </mesh>
              {/* Drawer Box Placeholder */}
              <mesh position={[0, 0, 0]}>
@@ -175,7 +185,7 @@ export const Wardrobe3D = React.forwardRef<Group, Wardrobe3DProps>(
       if (innerStructure.hangings <= 0) return null;
       
       const rodRadius = 0.05; // ft
-      const yPos = height - THICKNESS_FT - 0.5; // 6 inches from top
+      const yPos = height - loftHeight - THICKNESS_FT - 0.5; // 6 inches below loft/top
       
       return (
         <mesh position={[0, yPos, 0]} castShadow receiveShadow rotation={[0, 0, Math.PI / 2]}>
@@ -236,7 +246,7 @@ export const Wardrobe3D = React.forwardRef<Group, Wardrobe3DProps>(
 
         // Shelves in partition
         if (pShelves > 0) {
-          const availableHeight = height - 2 * THICKNESS_FT - (pDrawers > 0 ? pDrawers * 0.8 : 0);
+          const availableHeight = height - loftHeight - 2 * THICKNESS_FT - (pDrawers > 0 ? pDrawers * 0.8 : 0);
           const shelfSpacing = availableHeight / (pShelves + 1);
           for (let s = 0; s < pShelves; s++) {
             const yPos = THICKNESS_FT + (pDrawers > 0 ? pDrawers * 0.8 : 0) + shelfSpacing * (s + 1);
@@ -266,6 +276,11 @@ export const Wardrobe3D = React.forwardRef<Group, Wardrobe3DProps>(
                 <boxGeometry args={[partitionWidth - 2.2 * THICKNESS_FT, drawerHeight - 0.05, THICKNESS_FT]} />
                 <meshStandardMaterial color={innerColorHex} roughness={legitRough(innerRoughness)} metalness={innerMetalness} />
               </mesh>
+              {/* Grip recess */}
+              <mesh position={[0, drawerHeight/2 - 0.08, depth/2 - THICKNESS_FT/2 + 0.01]}>
+                <boxGeometry args={[partitionWidth - 2.6 * THICKNESS_FT, 0.08, 0.04]} />
+                <meshStandardMaterial color="#2b2015" roughness={0.4} metalness={0.1} />
+              </mesh>
               <mesh position={[0, 0, 0]}>
                 <boxGeometry args={[partitionWidth - 2.5 * THICKNESS_FT, drawerHeight - 0.1, depth - 2 * THICKNESS_FT]} />
                 <meshStandardMaterial color="#dddddd" roughness={0.9} />
@@ -276,7 +291,7 @@ export const Wardrobe3D = React.forwardRef<Group, Wardrobe3DProps>(
         // Hanging rod near top
         if (pHang > 0) {
           const rodRadius = 0.05;
-          const yPos = height - THICKNESS_FT - 0.5;
+          const yPos = height - loftHeight - THICKNESS_FT - 0.5;
           groups.push(
             <mesh key={`p${i}-h`} position={[centerX, yPos, 0]} castShadow receiveShadow rotation={[0, 0, Math.PI / 2]}>
               <cylinderGeometry args={[rodRadius, rodRadius, partitionWidth - 2 * THICKNESS_FT, 16]} />
@@ -318,60 +333,15 @@ export const Wardrobe3D = React.forwardRef<Group, Wardrobe3DProps>(
       );
     };
 
-    const renderDoors = () => {
-      const count = Math.max(1, outerStructure.doors);
-      const doorWidth = width / count;
-      const doorHeight = height; // Full height for now
-      const doorThickness = THICKNESS_FT;
-      
-      return Array.from({ length: count }).map((_, i) => {
-        // Calculate X position
-        // i=0 -> left side. Center of first door is -width/2 + doorWidth/2
-        const xPos = (-width / 2) + (doorWidth / 2) + (i * doorWidth);
-        
-        // Z offset for sliding doors
-        let zOffset = depth / 2 + doorThickness / 2;
-        if (outerStructure.openingType === 'slide') {
-           // Alternate depth for sliding
-           zOffset += (i % 2) * doorThickness; 
-        }
-
-        return (
-          <group key={`door-${i}`} position={[xPos, height / 2, zOffset]}>
-            <mesh castShadow receiveShadow>
-              <boxGeometry args={[doorWidth - 0.02, doorHeight, doorThickness]} />
-              <meshStandardMaterial color={outerColorHex} roughness={outerRoughness} metalness={outerMetalness} />
-            </mesh>
-            {/* Handle - Simplified */}
-            <mesh position={[outerStructure.openingType === 'slide' ? 0 : (i % 2 === 0 ? 0.3 * doorWidth : -0.3 * doorWidth), 0, doorThickness/2 + 0.02]}>
-               <boxGeometry args={[0.05, 1, 0.05]} />
-               <meshStandardMaterial color="#333333" metalness={0.8} roughness={0.2} />
-            </mesh>
-          </group>
-        );
-      });
-    };
-
     return (
       <group ref={ref}>
-        {viewSide === 'outer' ? (
-           <group>
-             {/* Render Carcass (hidden behind doors usually, but good to have edges) */}
-             {renderCarcass()}
-             {/* Render Doors */}
-             {renderDoors()}
-           </group>
-        ) : (
-           <group>
-             {/* Render Carcass */}
-             {renderCarcass()}
-             {/* Partition Dividers */}
-             {renderPartitionDividers()}
-             {/* Render Internals */}
-             {productType === 'wardrobe' ? renderPartitionInternals() : renderUniformInternals()}
-             {renderBarFeatures()}
-           </group>
-        )}
+        <group>
+          {renderCarcass()}
+          {renderLoft()}
+          {renderPartitionDividers()}
+          {productType === 'wardrobe' ? renderPartitionInternals() : renderUniformInternals()}
+          {renderBarFeatures()}
+        </group>
       </group>
     );
   }

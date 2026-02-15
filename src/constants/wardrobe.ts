@@ -22,6 +22,9 @@ export const AESTHETIC_OPTIONS: (AestheticOption & { roughness: number; metalnes
   { value: 'laminate', label: 'Laminate', pricePerSqFt: 300, roughness: 0.4, metalness: 0 },
   { value: 'membrane', label: 'Membrane', pricePerSqFt: 250, roughness: 0.6, metalness: 0 },
   { value: 'pu', label: 'PU', pricePerSqFt: 600, roughness: 0.1, metalness: 0.1 },
+  { value: 'Acrylic', label: 'Acrylic', pricePerSqFt: 500, roughness: 0.3, metalness: 0 },
+  { value : 'Wood and glass', label: 'Wood and Glass', pricePerSqFt: 700, roughness: 0.8, metalness: 0.2 },
+  { value: 'Aluminium and glass', label: 'Aluminium and Glass', pricePerSqFt: 800, roughness: 0.6, metalness: 0.3 }
 ];
 
 export const HARDWARE_OPTIONS: HardwareOption[] = [

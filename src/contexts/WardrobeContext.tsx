@@ -77,7 +77,11 @@ export const WardrobeProvider: React.FC<WardrobeProviderProps> = ({ children }) 
   }, [state.dimensions, state.materialConfig]);
 
   const setStep = useCallback((step: number) => {
-    setState((prev) => ({ ...prev, step }));
+    setState((prev) => ({
+      ...prev,
+      step,
+      ...(step === 2 ? { structureMode: 'internal', viewSide: 'inner' } : {}),
+    }));
   }, []);
 
   const setProductType = useCallback((productType: ProductType) => {

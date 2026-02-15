@@ -6,6 +6,7 @@
 import React from 'react';
 import { Box } from '@mui/material';
 import { CanvasView } from '../3D/CanvasView';
+import { ExternalPreview } from '../3D/ExternalPreview';
 import { ConfigPanel } from '../ConfigPanel/ConfigPanel';
 import { QuotePage } from '../Pages/QuotePage';
 import { useWardrobe } from '../../hooks/useWardrobe';
@@ -18,7 +19,7 @@ import { useWardrobe } from '../../hooks/useWardrobe';
 export const MainLayout: React.FC = () => {
   const { view, state } = useWardrobe();
   const stepOne = state.step === 1;
-  const hideCanvas = stepOne || (state.step === 2 && state.structureMode === 'external');
+  const hideLeft = view === 'config' && stepOne;
 
   return (
     <Box
@@ -30,7 +31,7 @@ export const MainLayout: React.FC = () => {
         overflow: 'hidden',
       }}
     >
-      {!hideCanvas && (
+      {!hideLeft && (
         <Box
           sx={{
             width: '50%',
@@ -40,11 +41,15 @@ export const MainLayout: React.FC = () => {
             boxShadow: 'inset -2px 0 4px rgba(0,0,0,0.05)',
           }}
         >
-          <CanvasView />
+          {view === 'config' && state.step === 2 && state.structureMode === 'external' ? (
+            <ExternalPreview />
+          ) : (
+            <CanvasView />
+          )}
         </Box>
       )}
 
-      <Box sx={{ width: stepOne ? '100%' : '50%', overflow: 'hidden' }}>
+      <Box sx={{ width: hideLeft ? '100%' : '50%', overflow: 'hidden' }}>
         {view === 'config' && <ConfigPanel />}
         {view === 'quote' && <QuotePage />}
       </Box>
